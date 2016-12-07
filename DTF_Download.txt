@@ -1,0 +1,763 @@
+/* 
+Author: bern13
+Created: 18th August 2016
+*/
+
+package testing2;
+
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.By;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import javax.swing.JOptionPane;
+
+
+
+public class chrome {
+ 
+	/*
+	**************************************************************************
+	**************************************************************************
+	**      PLEASE ENTER ALL USER-DEFINED VARIABLES STARTING FROM...HERE    **
+	**************************************************************************
+	**************************************************************************
+	
+	*/
+
+	//************* STATE YOUR DATE RANGE***************************
+	//start month
+	public static int sm = 6;
+	
+	//end month (put same number if same as start month)
+	public static int em = 8;
+	
+	//start date
+	public static int sd = 5;
+	
+	//end date
+	public static int ed = 10;
+	
+	//year
+	public static String y = "2016";
+
+	
+	//**********INDICATE WHICH FILES TO DL**********************
+	public static String clicks = "no";
+	public static String matchtable = "yes";
+	public static String impressions = "no";
+	public static String activity = "no";
+	
+	
+	//**************other variables and stuff************
+	public static String fyle; 
+	public static String searchKey;
+	
+	public static String AdvertiserID = "";
+	public static String setup = "";
+	
+	//**************FILE DESTINATIONS************
+	public static String dlFolder = "C:/Users/…/Downloads/";
+	public static String orifiledest = "C:/Users/…/Desktop/Bucket files/";
+	public static String filedest;
+	public static String chromedriverfile = "C:/Users/…/Downloads/chromedriver_win32/chromedriver.exe";
+
+	//**************SITE URL****************************
+	public static String siteURL = "https://console.developers.google.com/storage/dfa…….;
+	
+	//****** FOLDER NAMES
+	public static String impFile = "Impressions"; //IMPRESSIONS
+	public static String clickFile = "Clicks"; //CLICKS
+	public static String actFile = "Activities"; //ACTIVITY
+	public static String matchTablefolder = "MatchTables"; //MATCHTABLES
+	
+	//MATCHTABLE FOLDERS
+	public static String actcatFile = "Activity Category";
+	public static String acttypeFile = "Activity Type";
+	public static String adFile = "Ad";
+	public static String adpageassignFile = "Ad Page Assignments";
+	public static String advertiserFile = "Advertiser";
+	public static String browsersFile = "Browser";
+	public static String campaignsFile = "Campaigns";
+	public static String citiesFile = "Cities";
+	public static String countriesFile = "Countries";
+	public static String creativeFile = "Creative";
+	public static String creAdAsFile = "Creative Ad Assignments";
+	public static String CustCreFile = "Custom Creative Fields";
+	public static String dartFile = "Dart Search";
+	public static String desigFile = "Designated Market Area";
+	public static String keyvalFile = "Key Value";
+	public static String metFile = "Met Event";
+	public static String operatingFile = "Operating Systems";
+	public static String pageFile = "Page";
+	public static String pagecostFile = "Page Cost";
+	public static String pageflightFile = "Page Flight Cost";
+	public static String siteFile = "Site";
+	public static String statesFile = "States";
+	public static String userdefinedFile = "User Defined Spot vars";
+
+	/*
+	**************************************************************************
+	**************************************************************************
+	**     DOUBLE CHECK THAT YOU FILLED UP EVERYTHING! YOUR JOB IS DONE.    **
+	**     BELOW IS ALL CODE. DO NOT CHANGE.                                **
+	**************************************************************************
+	**************************************************************************
+	
+	*/
+
+	
+	
+	
+	
+	
+//****************GENERAL CODE************************
+
+  public static void main(String[] args) throws InterruptedException {
+	  System.setProperty("webdriver.chrome.driver",chromedriverfile);
+		WebDriver driver = new ChromeDriver();
+
+	login(driver);
+	
+
+if (clicks == "yes"){
+
+fyle = "NetworkClick";
+searchKey = "_" + setup + "_";
+DownloadFiles(driver);
+filedest = orifiledest + clickFile;
+boolean success3 = (new File(filedest)).mkdirs();
+if (!success3) {
+// "Directory creation failed"
+}
+movefiles();
+} 
+
+
+if (activity == "yes"){
+fyle = "NetworkActivity";
+searchKey = "_" + setup + "_" + AdvertiserID + "_";
+DownloadFiles(driver);
+filedest = orifiledest + actFile;
+boolean success = (new File(filedest)).mkdirs();
+if (!success) {
+// "Directory creation failed"
+}
+movefiles();
+
+}
+
+
+if (impressions == "yes"){
+fyle = "NetworkImpression";
+searchKey = "_" + setup + "_";
+DownloadFiles(driver);
+filedest = orifiledest + impFile;
+boolean success2 = (new File(filedest)).mkdirs();
+if (!success2) {
+// "Directory creation failed"	
+}
+
+try {
+	Thread.sleep(30000);
+} catch (InterruptedException e) {
+	// TODO Auto-generated catch block
+	e.printStackTrace();
+}
+movefiles();
+}
+
+
+
+	
+if (matchtable == "yes"){
+	filedest = “…\\data\\Bucket files" + "/" + matchTablefolder;
+	Matchtablefiles(driver);
+	matchfiles();
+	
+
+	moveMatch();
+ }
+						
+						
+						
+	}
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+	//*****************LOGIN***************************
+	public static void login(WebDriver driver) {
+	 
+			
+		// Auto-generated method stub
+
+		
+		driver.navigate().to("https://accounts.google.com/ServiceLogin?passive=true………”) ;
+
+		
+		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+
+		//driver.navigate().to("https://accounts.google.com/ServiceLogin?passive=true…….”);
+		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+		driver.findElement(By.id("Email")).sendKeys(“PUT EMAIL HERE”);
+		driver.findElement(By.id("next")).click();
+		driver.findElement(By.id("Passwd")).sendKeys(“PUT PASSWORD HERE“);
+		driver.findElement(By.id("signIn")).click(); }
+	
+	
+	
+	//******************CLICK AND DOWNLOAD FILES************************
+		public static void DownloadFiles(WebDriver driver) throws InterruptedException {
+
+				
+
+			//if its consecutive months
+		if(em-sm==1){		
+			driver.navigate().to(siteURL + fyle) ;
+
+			if (sm<10){
+			driver.findElement(By.name("searchPrefix")).sendKeys(searchKey + "0" + sm);}
+			else {driver.findElement(By.name("searchPrefix")).sendKeys(searchKey + sm);}
+			
+			Thread.sleep(2000);
+					for(int i=sd ; i<=31 ; i++)
+					{
+						if (sm<10){
+							if (i<10){
+						   try{
+						driver.findElement(By.cssSelector("a[href*='_0"+ sm +"-0"+ i +"-" + y + "']")).click();
+						Thread.sleep(1000);	 
+						   } catch(Exception e){}} else {
+							try{
+								driver.findElement(By.cssSelector("a[href*='_0"+ sm +"-"+ i +"-" + y + "']")).click();
+								Thread.sleep(1000);	 
+								   } catch(Exception e){}}}
+							else {						
+								try{
+							
+								driver.findElement(By.cssSelector("a[href*='_"+ sm +"-"+ i +"-" + y + "']")).click();
+								Thread.sleep(1000);	 
+								   } catch(Exception e){}}}
+						
+						
+						
+						if (em<10){
+							driver.navigate().to(siteURL + fyle) ;
+
+							driver.findElement(By.name("searchPrefix")).sendKeys(searchKey + "0" + em);}
+							else {driver.findElement(By.name("searchPrefix")).sendKeys(searchKey + em);}
+						Thread.sleep(2000);
+									for(int i=1 ; i<=ed ; i++)
+									{
+										if (sm<10){
+											if (i<10){
+										   try{
+										driver.findElement(By.cssSelector("a[href*='_0"+ em +"-0"+ i +"-" + y + "']")).click();
+										Thread.sleep(1000);	 
+										   } catch(Exception e){}} else {
+											try{
+												driver.findElement(By.cssSelector("a[href*='_0"+ em +"-"+ i +"-" + y + "']")).click();
+												Thread.sleep(1000);	 
+												   } catch(Exception e){}}}
+											else {						
+												try{
+											
+												driver.findElement(By.cssSelector("a[href*='_"+ em +"-"+ i +"-" + y + "']")).click();
+												Thread.sleep(1000);	 
+												   } catch(Exception e){}}}
+									
+										
+				} else
+					
+					//if its more than one month apart
+			if(em-sm>1) {
+						if (sm<10){
+							driver.navigate().to(siteURL + fyle) ;
+							driver.findElement(By.name("searchPrefix")).sendKeys(searchKey + "0" + sm);}
+							else {driver.findElement(By.name("searchPrefix")).sendKeys(searchKey + sm);}
+						Thread.sleep(2000);
+									for(int i=sd ; i<=31 ; i++)
+									{
+										if (sm<10){
+											if (i<10){
+										   try{
+										driver.findElement(By.cssSelector("a[href*='_0"+ sm +"-0"+ i +"-" + y + "']")).click();
+										Thread.sleep(1000);	 
+										   } catch(Exception e){}} else {
+											try{
+												driver.findElement(By.cssSelector("a[href*='_0"+ sm +"-"+ i +"-" + y + "']")).click();
+												Thread.sleep(1000);	 
+												   } catch(Exception e){}}}
+											else {						
+												try{
+											
+												driver.findElement(By.cssSelector("a[href*='_"+ sm +"-"+ i +"-" + y + "']")).click();
+												Thread.sleep(1000);	 
+												   } catch(Exception e){}}}
+		
+
+					for(int mo=(sm+1) ; mo<=(em-1) ; mo++){
+						
+						if (mo<10){
+							driver.navigate().to(siteURL + fyle) ;
+							driver.findElement(By.name("searchPrefix")).sendKeys(searchKey + "0" + mo);}
+							else {driver.findElement(By.name("searchPrefix")).sendKeys(searchKey + mo);}
+						Thread.sleep(2000);
+									for(int i=1 ; i<=31 ; i++)
+									{
+										if (mo<10){
+											if (i<10){
+										   try{
+										driver.findElement(By.cssSelector("a[href*='_0"+ mo +"-0"+ i +"-" + y + "']")).click();
+										Thread.sleep(1000);	 
+										   } catch(Exception e){}} else {
+											try{
+												driver.findElement(By.cssSelector("a[href*='_0"+ mo +"-"+ i +"-" + y + "']")).click();
+												Thread.sleep(1000);	 
+												   } catch(Exception e){}}}
+											else {						
+												try{
+											
+												driver.findElement(By.cssSelector("a[href*='_"+ mo +"-"+ i +"-" + y + "']")).click();
+												Thread.sleep(1000);	 
+												   } catch(Exception e){}}}}
+					
+
+					if (em<10){
+						driver.navigate().to(siteURL + fyle) ;
+						driver.findElement(By.name("searchPrefix")).sendKeys(searchKey + "0" + em);}
+						else {driver.findElement(By.name("searchPrefix")).sendKeys(searchKey+ em);}
+					Thread.sleep(2000);
+								for(int i=1 ; i<=ed ; i++)
+								{
+									if (em<10){
+										if (i<10){
+									   try{
+									driver.findElement(By.cssSelector("a[href*='_0"+ em +"-0"+ i +"-" + y + "']")).click();
+									Thread.sleep(1000);	 
+									   } catch(Exception e){}} else {
+										try{
+											driver.findElement(By.cssSelector("a[href*='_0"+ em +"-"+ i +"-" + y + "']")).click();
+											Thread.sleep(1000);	 
+											   } catch(Exception e){}}}
+										else {						
+											try{
+										
+											driver.findElement(By.cssSelector("a[href*='_"+ em +"-"+ i +"-" + y + "']")).click();
+											Thread.sleep(1000);	 
+											   } catch(Exception e){}}}}
+
+		
+		
+					
+					
+						   else {
+							  if(em<10){
+							   driver.navigate().to(siteURL + fyle) ;
+								driver.findElement(By.name("searchPrefix")).sendKeys(searchKey + "0" + em);}
+								else {driver.findElement(By.name("searchPrefix")).sendKeys(searchKey + em);}
+		  
+										for(int i=sd ; i<=ed ; i++)
+										{
+											if (em<10){
+												if (i<10){
+											   try{
+											driver.findElement(By.cssSelector("a[href*='_0"+ em +"-0"+ i +"-" + y + "']")).click();
+											Thread.sleep(1000);	 
+											   } catch(Exception e){}} else {
+												try{
+													driver.findElement(By.cssSelector("a[href*='_0"+ em +"-"+ i +"-" + y + "']")).click();
+													Thread.sleep(1000);	 
+													   } catch(Exception e){}}}
+			} }
+
+		
+			}
+
+		
+		//******************MATCHTABLES DOWNLOAD************************
+
+		public static void Matchtablefiles(WebDriver driver) throws InterruptedException {
+			
+			//Consecutive months
+if (em-sm == 1){
+			for (int k = sd; k<=31 ; k++) {
+					if (sm<10) {
+						if (k<10){
+							driver.navigate().to(siteURL + "NetworkMatchtablesActivity_" + setup + "_0" + sm + "-0" + k);}
+							else {driver.navigate().to(siteURL + "NetworkMatchtablesActivity_" + setup + "_0" + sm + "-" + k);}
+					} else  {
+						if (k<10){driver.navigate().to(siteURL + "NetworkMatchtablesActivity_" + setup + "_" + sm + "-0" + k);}
+						else {driver.navigate().to(siteURL + "NetworkMatchtablesActivity_" + setup + "_" + sm + "-" + k);}
+					}
+						
+						//		try{
+				List<WebElement> linkList=driver.findElements(By.className("p6n-inline"));
+
+				//now traverse over the list and check
+				for(int i=0 ; i<linkList.size() ; i++)
+				{
+				        linkList.get(i).click();
+				}
+			}
+
+	
+				for (int k = 1; k<=ed ; k++) {
+					if (em<10) {
+						if (k<10){
+							driver.navigate().to(siteURL + "NetworkMatchtablesActivity_" + setup + "_0" + em + "-0" + k);}
+							else {driver.navigate().to(siteURL + "NetworkMatchtablesActivity_" + setup + "_0" + em + "-" + k);}
+					} else  {
+						if (k<10){driver.navigate().to(siteURL + "NetworkMatchtablesActivity_" + setup + "_" + em + "-0" + k);}
+						else {driver.navigate().to(siteURL + "NetworkMatchtablesActivity_" + setup + "_" + em + "-" + k);}
+					}
+						
+						//		try{
+				List<WebElement> linkList=driver.findElements(By.className("p6n-inline"));
+
+				//now traverse over the list and check
+				for(int i=0 ; i<linkList.size() ; i++)
+				{
+				        linkList.get(i).click();
+				}
+			}
+}
+
+
+//SAME MONTH
+if (em==sm){
+	for (int k = sd; k<=ed ; k++) {
+			if (sm<10) {
+				if (k<10){
+					driver.navigate().to(siteURL + "NetworkMatchtablesActivity_" + setup + "_0" + sm + "-0" + k);}
+					else {driver.navigate().to(siteURL + "NetworkMatchtablesActivity_" + setup + "_0" + sm + "-" + k);}
+			} else  {
+				if (k<10){driver.navigate().to(siteURL + "NetworkMatchtablesActivity_" + setup + "_" + sm + "-0" + k);}
+				else {driver.navigate().to(siteURL + "NetworkMatchtablesActivity_" + setup + "_" + sm + "-" + k);}
+			}
+				
+				//		try{
+		List<WebElement> linkList=driver.findElements(By.className("p6n-inline"));
+
+		//now traverse over the list and check
+		for(int i=0 ; i<linkList.size() ; i++)
+		{
+		        linkList.get(i).click();
+		}
+	}
+	
+}
+
+
+
+//MORE THAN A MONTH APART
+if (em-sm > 1){
+	for (int k = sd; k<=31 ; k++) {
+			if (sm<10) {
+				if (k<10){
+					driver.navigate().to(siteURL + "NetworkMatchtablesActivity_" + setup + "_0" + sm + "-0" + k);}
+					else {driver.navigate().to(siteURL + "NetworkMatchtablesActivity_" + setup + "_0" + sm + "-" + k);}
+			} else  {
+				if (k<10){driver.navigate().to(siteURL + "NetworkMatchtablesActivity_" + setup + "_" + sm + "-0" + k);}
+				else {driver.navigate().to(siteURL + "NetworkMatchtablesActivity_" + setup + "_" + sm + "-" + k);}
+			}
+				
+				//		try{
+		List<WebElement> linkList=driver.findElements(By.className("p6n-inline"));
+
+		//now traverse over the list and check
+		for(int i=0 ; i<linkList.size() ; i++)
+		{
+		        linkList.get(i).click();
+		}
+	}
+
+	for(int mo=(sm+1) ; mo<=(em-1) ; mo++){
+		for (int k = 1; k<=31 ; k++) {
+		if (mo<10) {
+			if (k<10){
+				driver.navigate().to(siteURL + "NetworkMatchtablesActivity_" + setup + "_0" + mo + "-0" + k);}
+				else {driver.navigate().to(siteURL + "NetworkMatchtablesActivity_" + setup + "_0" + mo + "-" + k);}
+		} else  {
+			if (k<10){driver.navigate().to(siteURL + "NetworkMatchtablesActivity_" + setup + "_" + mo + "-0" + k);}
+			else {driver.navigate().to(siteURL + "NetworkMatchtablesActivity_" + setup + "_" + mo + "-" + k);}
+		}
+			
+			//		try{
+	List<WebElement> linkList=driver.findElements(By.className("p6n-inline"));
+
+	//now traverse over the list and check
+	for(int i=0 ; i<linkList.size() ; i++)
+	{
+	        linkList.get(i).click();
+	}
+	} }
+	
+	
+	
+	
+	
+	
+		for (int k = 1; k<=ed ; k++) {
+			if (em<10) {
+				if (k<10){
+					driver.navigate().to(siteURL + "NetworkMatchtablesActivity_" + setup + "_0" + em + "-0" + k);}
+					else {driver.navigate().to(siteURL + "NetworkMatchtablesActivity_" + setup + "_0" + em + "-" + k);}
+			} else  {
+				if (k<10){driver.navigate().to(siteURL + "NetworkMatchtablesActivity_" + setup + "_" + em + "-0" + k);}
+				else {driver.navigate().to(siteURL + "NetworkMatchtablesActivity_" + setup + "_" + em + "-" + k);}
+			}
+				
+				//		try{
+		List<WebElement> linkList=driver.findElements(By.className("p6n-inline"));
+
+		//now traverse over the list and check
+		for(int i=0 ; i<linkList.size() ; i++)
+		{
+		        linkList.get(i).click();
+		}
+	}
+}
+
+
+
+		}
+				
+				
+	
+			
+	
+	//***********MATCHTABLES FOLDER CREATION*************
+	public static void matchfiles() {
+	String filedestma = filedest;
+		boolean success2 = (new File(filedestma)).mkdirs();
+		if (!success2) {
+		// "Directory creation failed"
+		}
+		
+		List<String> FileLists = new ArrayList<String>();
+		
+				FileLists.add(actcatFile);
+				FileLists.add(acttypeFile);
+				FileLists.add(adFile);
+				FileLists.add(adpageassignFile);
+				FileLists.add(advertiserFile);
+				FileLists.add(browsersFile);
+				FileLists.add(campaignsFile);
+				FileLists.add(countriesFile);
+				FileLists.add(citiesFile);
+				FileLists.add(creativeFile);
+				FileLists.add(creAdAsFile);
+				FileLists.add(CustCreFile);
+				FileLists.add(dartFile);
+				FileLists.add(desigFile);
+				FileLists.add(keyvalFile);
+				FileLists.add(metFile);
+				FileLists.add(operatingFile);
+				FileLists.add(pageFile);
+				FileLists.add(pagecostFile);
+				FileLists.add(pageflightFile);
+				FileLists.add(siteFile );
+				FileLists.add(statesFile);
+				FileLists.add(userdefinedFile);
+	
+				
+				for (String matchfolder : FileLists) {
+				boolean success = (new File(filedestma + "/" + matchfolder)).mkdirs();
+				if (!success) {
+				// "Directory creation failed"
+				}
+
+				
+	}}
+	
+	//***********MOVING MATCHTABLES FILES*************
+	public static void moveMatch(){
+		  int confirm = JOptionPane.showConfirmDialog(
+	            null
+	    , "All matchtable files downloaded?"
+	    , "Move Files "
+	    , JOptionPane.OK_CANCEL_OPTION
+	    , JOptionPane.INFORMATION_MESSAGE);    
+	if (confirm == JOptionPane.OK_OPTION)
+
+	  try {
+		  
+	  	Thread.sleep(5000);
+	  	
+	      String pathname = dlFolder;
+		  	String k = "unknown file name";
+	      File f1 = new File(pathname);
+	      String[] allFiles = f1.list();
+	      InputStream inStream = null;
+	      OutputStream outStream = null;
+	      byte[] buffer = new byte[1024];
+	      for (String file : allFiles) {
+	        if (file.contains("NetworkMatchtables")){	          	
+	     	  	if (file.contains("activity_cat")){
+	      		k = actcatFile;
+	     	  	} else if (file.contains("type")){
+	    	  		k = acttypeFile;
+	    	  
+	    	  	} else if (file.contains("page_assignments")){
+	    	  		k = adpageassignFile;
+	    	  	} else if (file.contains("advertiser")){
+	    	  		k = advertiserFile;
+	    	  	} else if (file.contains("browsers")){
+	    	  		k = browsersFile;
+	    	  	} else if (file.contains("campaign")){
+	    	  		k = campaignsFile;
+	    	  	} else if (file.contains("countries")){
+	    	  		k = countriesFile;
+	    	  	} else if (file.contains("cities")){
+	    	  		k = citiesFile; 	
+	    	  	} else if (file.contains("creative_ad")){
+	    	  		k = creAdAsFile;
+	    	  	} else if (file.contains("custom_creative")){
+	    	  		k = CustCreFile;
+	    	  	} else if (file.contains("dart")){
+	    	  		k = dartFile;
+	    	  	} else if (file.contains("designated")){
+	    	  		k = desigFile;
+	    	  	} else if (file.contains("keyval")){
+	    	  		k = keyvalFile;
+	    	  	} else if (file.contains("met_event")){
+	    	  		k = metFile;
+	    	  	} else if (file.contains("operating")){
+	    	  		k = operatingFile;
+	    	  	} else if (file.contains("page_cost")){
+	    	  		k = pagecostFile;
+	    	  	} else if (file.contains("page_flight")){
+	    	  		k = pageflightFile;
+	    	  	} else if (file.contains("site")){
+	    	  		k = siteFile;
+	    	  	} else if (file.contains("states")){
+	    	  		k = statesFile;
+	    	  	} else if (file.contains("user_defined_spot")){
+	    	  		k = userdefinedFile;
+	    		}	else if (file.contains("_ad")){
+	    	  		k = adFile;
+	    	  	} else if (file.contains("creative")){
+	    	  		k = creativeFile;
+	    	 	} else if (file.contains("page")){
+	    	  		k = pageFile;
+	    		}
+	      	  	
+	      	  	
+	    //	  	filedest = "C:/Users/berlow/Desktop/Bucket files/" + matchTablefolder + "/" + k + "/";
+	        	Object filedest2 = filedest + "/" + k + "/";
+	      	  	
+	      	  	
+					File source = new File(dlFolder+ file);
+					File dest = new File(filedest2 + file);
+					inStream = new FileInputStream(source);
+					outStream = new FileOutputStream(dest);
+					int length;
+	          	while ((length = inStream.read(buffer)) > 0) {
+	          		outStream.write(buffer, 0, length);
+	          	}
+	          	inStream.close();
+	          	outStream.close();
+	          	source.delete();
+				
+	      }
+
+	      }} catch (Exception ex) {
+	      ex.printStackTrace();
+	  
+	}
+	  
+	// System.out.println("Selected Option is OK : " + selection);
+
+	else if (confirm == JOptionPane.CANCEL_OPTION)
+	{
+
+	// Code to use when CANCEL is PRESSED.
+	System.out.println("Selected Option Is CANCEL : " + confirm);
+	System.exit(0);
+	}
+		}
+		
+			
+
+	
+	
+	//************************MOVE FILES********************
+	public static void movefiles(){
+	  int confirm = JOptionPane.showConfirmDialog(
+            null
+    , "All " + fyle + " files downloaded?"
+    , "Move Files "
+    , JOptionPane.OK_CANCEL_OPTION
+    , JOptionPane.INFORMATION_MESSAGE);    
+if (confirm == JOptionPane.OK_OPTION)
+
+  try {
+  	Thread.sleep(5000);
+      String pathname = dlFolder;
+      File f1 = new File(pathname);
+      String[] allFiles = f1.list();
+      InputStream inStream = null;
+      OutputStream outStream = null;
+      byte[] buffer = new byte[1024];
+      for (String file : allFiles) {
+      
+          if (file.contains(fyle)) {
+				File source = new File(dlFolder + file);
+				File dest = new File(filedest + "/" + file);
+				inStream = new FileInputStream(source);
+				outStream = new FileOutputStream(dest);
+				int length;
+          	while ((length = inStream.read(buffer)) > 0) {
+          		outStream.write(buffer, 0, length);
+          	}
+          	inStream.close();
+          	outStream.close();
+          	source.delete();
+			}
+      }
+
+  } catch (Exception ex) {
+      ex.printStackTrace();
+  
+}
+  
+// System.out.println("Selected Option is OK : " + selection);
+
+else if (confirm == JOptionPane.CANCEL_OPTION)
+{
+
+// Code to use when CANCEL is PRESSED.
+System.out.println("Selected Option Is CANCEL : " + confirm);
+System.exit(0);
+}
+	}
+	
+
+
+	
+	
+	}	
